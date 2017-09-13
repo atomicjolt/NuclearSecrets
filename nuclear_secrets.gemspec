@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.email       = ["nick.benoit14@gmail.com"]
   s.summary     = "Quell rails secret espionage by verifying what secrets exist and their types in your rails application"
   s.description = "Rails secrets checker"
+  s.homepage    = "https://github.com/atomicjolt/NuclearSecrets"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
