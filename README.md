@@ -1,5 +1,5 @@
 # NuclearSecrets
-Short description and motivation.
+Quell rails secret espionage by verifying what secrets exist and their types in your rails application
 
 ## Usage
 Record all application secrets and their appropriate types in Nuclear Secrets initializer.
