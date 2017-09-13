@@ -54,9 +54,6 @@ module NuclearSecrets
       missing_secrets = req_secret_pairs - types
       extra_secrets = types - req_secret_pairs
 
-      # TODO type error message
-      # TODO add config type checking
-      # TODO accept types in config
       raise SecretsMissingError.new(missing_secrets) unless missing_secrets.empty?
       raise ExtraSecretsError.new(extra_secrets) unless extra_secrets.empty?
     end
