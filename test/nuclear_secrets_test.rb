@@ -60,4 +60,21 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
       )
     end
   end
+
+  test "handles class name as value" do
+    assert_nothing_raised do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          one_fish: String,
+          two_fish: Fixnum,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          one_fish: "Red Fish",
+          two_fish: 2,
+        },
+      )
+    end
+  end
 end

@@ -48,7 +48,7 @@ module NuclearSecrets
 
     def check_secrets(secrets)
       raise NuclearSecrets::RequiredSecretsListMissing if required_secrets.nil?
-      req_secret_pairs = required_secrets.map { |pair| [pair.first.to_sym, pair.last] }
+      req_secret_pairs = required_secrets.map { |pair| [pair.first.to_sym, pair.last.to_s] }
       types = secrets.map { |pair| [pair.first, pair.last.class.to_s] }
 
       missing_secrets = req_secret_pairs - types
