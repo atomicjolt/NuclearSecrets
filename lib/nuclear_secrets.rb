@@ -39,16 +39,24 @@ module NuclearSecrets
     end
   end
 
-  def self.check_secrets(secrets)
-    raise NuclearSecrets::RequiredSecretsListMissing unless secrets[:required_secrets].present?
-    required_secrets = secrets[:required_secrets].map { |pair| [pair.first.to_sym, pair.last] }
-    types = secrets.map { |pair| [pair.first, pair.last.class.to_s] }
+  class << self
+    attr_accessor(:required_secrets)
 
-    missing_secrets = required_secrets - types
-    extra_secrets = types - required_secrets
+    def configure
+      yield self if block_given?
+    end
 
-    # TODO type error message
-    raise SecretsMissingError.new(missing_secrets) unless missing_secrets.empty?
-    raise ExtraSecretsError.new(extra_secrets) unless extra_secrets.empty?
+    def check_secrets(secrets)
+      raise NuclearSecrets::RequiredSecretsListMissing unless secrets[:required_secrets].present?
+      required_secrets = secrets[:required_secrets].map { |pair| [pair.first.to_sym, pair.last] }
+      types = secrets.map { |pair| [pair.first, pair.last.class.to_s] }
+
+      missing_secrets = required_secrets - types
+      extra_secrets = types - required_secrets
+
+      # TODO type error message
+      raise SecretsMissingError.new(missing_secrets) unless missing_secrets.empty?
+      raise ExtraSecretsError.new(extra_secrets) unless extra_secrets.empty?
+    end
   end
 end
