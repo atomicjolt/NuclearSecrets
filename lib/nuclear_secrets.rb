@@ -47,12 +47,12 @@ module NuclearSecrets
     end
 
     def check_secrets(secrets)
-      raise NuclearSecrets::RequiredSecretsListMissing unless secrets[:required_secrets].present?
-      required_secrets = secrets[:required_secrets].map { |pair| [pair.first.to_sym, pair.last] }
+      raise NuclearSecrets::RequiredSecretsListMissing if required_secrets.nil?
+      req_secret_pairs = required_secrets.map { |pair| [pair.first.to_sym, pair.last] }
       types = secrets.map { |pair| [pair.first, pair.last.class.to_s] }
 
-      missing_secrets = required_secrets - types
-      extra_secrets = types - required_secrets
+      missing_secrets = req_secret_pairs - types
+      extra_secrets = types - req_secret_pairs
 
       # TODO type error message
       raise SecretsMissingError.new(missing_secrets) unless missing_secrets.empty?
