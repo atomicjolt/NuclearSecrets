@@ -7,7 +7,7 @@ require "nuclear_secrets/version"
 Gem::Specification.new do |s|
   s.name        = "nuclear_secrets"
   s.version     = NuclearSecrets::VERSION
-  s.authors     = ["Nick Benoit"]
+  s.authors     = ["Atomic Jolt", "Nick Benoit"]
   s.email       = ["nick.benoit14@gmail.com"]
   s.summary     = "Quell rails secret espionage by verifying what secrets exist and their types in your rails application"
   s.description = "Rails secrets checker"

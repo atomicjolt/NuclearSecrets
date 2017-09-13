@@ -2,7 +2,10 @@
 Short description and motivation.
 
 ## Usage
-How to use my plugin.
+Record all application secrets and their appropriate types in Nuclear Secrets initializer.
+If your application loads secrets that are not recorded, or your app does not load a
+required secret, your rails app will crash and inform you of what missing or extra
+secrets exist.
 
 ## Installation
 Add this line to your application's Gemfile:
@@ -16,10 +19,16 @@ And then execute:
 $ bundle
 ```
 
-Or install it yourself as:
-```bash
-$ gem install nuclear_secrets
+Add initializer to your rails application at `config/initializers/nuclear_secrets.rb`
+```ruby
+NuclearSecrets.configure do |config|
+  config.required_secrets = {
+    my_string_secret: String,
+    my_numeric_secret: Fixnum,
+  }
+end
 ```
+Include all secrets that your application utilizes, and their types, in `required_secrets` hash
 
 ## Contributing
 Contribution directions go here.
