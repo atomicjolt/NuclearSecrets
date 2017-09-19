@@ -15,7 +15,7 @@ module NuclearSecrets
 
   class RequiredSecretsListMissing < NuclearSecretError
     def message
-      "You must include a required_secrets key in your config/secrets.yml file"
+      "You must include a NuclearSecrets initializer in your app"
     end
   end
 

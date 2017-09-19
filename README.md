@@ -1,4 +1,4 @@
-# NuclearSecrets
+# Nuclear Secrets
 Quell rails secret espionage by verifying what secrets exist and their types in your rails application
 
 ## Usage
