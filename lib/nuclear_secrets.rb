@@ -46,16 +46,53 @@ module NuclearSecrets
       yield self if block_given?
     end
 
+    def make_type_check(type)
+      Proc.new { |item| item.class == type }
+    end
+
+    def build_assertions(existing_keys)
+      existing_keys.map do |key|
+        if required_secrets[key].class == Class
+          make_type_check(required_secrets[key])
+        elsif required_secrets[key].respond_to? :call
+          required_secrets[key]
+        else
+          # TODO
+          # Throw invalid value error
+          raise "Bad assert"
+        end
+      end
+    end 
+
+    def check_assertions(secrets, assertions)
+      secrets.to_a.zip(assertions).map do |pair|
+        result = pair.last.call(pair.first[1])
+        if result
+          nil
+        else
+          # TODO 
+          StandardError.new("BAAAD")
+        end
+      end
+    end
+
     def check_secrets(secrets)
       raise NuclearSecrets::RequiredSecretsListMissing if required_secrets.nil?
-      req_secret_pairs = required_secrets.map { |pair| [pair.first.to_sym, pair.last.to_s] }
-      types = secrets.map { |pair| [pair.first, pair.last.class.to_s] }
+      req_keys = required_secrets.keys
+      existing_keys = secrets.keys
 
-      missing_secrets = req_secret_pairs - types
-      extra_secrets = types - req_secret_pairs
+      missing_keys = req_keys - existing_keys
+      extra_keys = existing_keys - req_keys
 
-      raise SecretsMissingError.new(missing_secrets) unless missing_secrets.empty?
-      raise ExtraSecretsError.new(extra_secrets) unless extra_secrets.empty?
+      #TODO refactor errors
+      #TODO add wrong type error
+      raise SecretsMissingError.new(missing_keys) unless missing_keys.empty?
+      raise ExtraSecretsError.new(extra_keys) unless extra_keys.empty?    
+      assertions = build_assertions(existing_keys)
+      errors = check_assertions(secrets, assertions)
+      errors.compact.each do |err|
+        raise err
+      end
     end
   end
 end
