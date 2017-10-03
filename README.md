@@ -30,6 +30,21 @@ end
 ```
 Include all secrets that your application utilizes, and their types, in `required_secrets` hash
 
+## Advanced Usage
+In addition to being able to supply NuclearSecrets with the type of a secret,
+you can also pass a Proc or a Lambda. If the proc or lamba returns true when
+passed the value of the secret, then the secret will be allowed.
+
+```
+NuclearSecrets.configure do |config|
+  config.required_secrets = {
+    my_string_secret: String,
+    my_numeric_secret: Fixnum,
+    my_secret: Proc.new { |secret| secret.is_worthy? }
+  }
+end
+```
+
 ## Contributing
 Contribution directions go here.
 
