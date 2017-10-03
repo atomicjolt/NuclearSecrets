@@ -8,3 +8,4 @@ test/dummy/tmp/
 .byebug_history
 notes.md
 /Gemfile.lock
+test/dummy/.byebug_history
