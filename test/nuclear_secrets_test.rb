@@ -93,8 +93,39 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
         },
       )
     end
-  end 
+  end
 
-  ## TODO test wrong secret  type
-  # TODO test invalid type check type
+  test "raises invalid required value with invalid value" do
+    assert_raises(NuclearSecrets::InvalidRequiredSecretValue) do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          one_fish: Proc.new { true },
+          two_fish: nil,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          one_fish: "Red Fish",
+          two_fish: 2,
+        },
+      )
+    end
+  end
+
+  test "raises mismatched value error" do
+    assert_raises(NuclearSecrets::MismatchedSecretType) do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          one_fish: Proc.new { true },
+          two_fish: Fixnum,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          one_fish: "Red Fish",
+          two_fish: "2",
+        },
+      )
+    end
+  end
 end
