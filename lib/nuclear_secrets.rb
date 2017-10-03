@@ -6,14 +6,34 @@ module NuclearSecrets
       @secrets = secrets
     end
 
+    def required_type_message(req_type)
+      if req_type.nil?
+        " of value nil"
+      elsif req_type.class == Class
+        " of type #{req_type}"
+      elsif req_type.class == Proc
+        source_pair = req_type.source_location
+        " of type Proc (defined in file: #{source_pair.first}, line: #{source_pair.last})"
+      else
+        " of value #{req_type}"
+      end
+    end
+
+    def given_type_message(given_type)
+      if given_type.nil?
+        "\n"
+      elsif given_type.class == String
+        " was given \"#{given_type}\"\n"
+      else
+        " was given #{given_type}\n"
+      end
+    end
+
     def get_error_list
       @secrets.reduce("") do |message, current|
-        message << "#{current.first} of type #{current[1]}"
-        message << if current.last.nil?
-                     "\n"
-                   else
-                     "was given #{current.last}\n"
-                   end
+        message << current.first.to_s
+        message << required_type_message(current[1])
+        message << given_type_message(current.last)
       end
     end
   end
@@ -75,7 +95,10 @@ module NuclearSecrets
       Proc.new { |item| item.class == type }
     end
 
-    # [key, req, given]
+    # secrets: hash of given secrets
+    # required_values: hash of required secrets
+    # key: key to build tuple for
+    # returns [key, required_type, given_type]
     def build_secret_tuple(secrets, required_values, key)
       [key, required_values[key], secrets[key]]
     end
@@ -110,7 +133,10 @@ module NuclearSecrets
         else
           false
         end
-      end.map { |key| build_pairs(key, secrets) }
+      end.map do |pair|
+        flat_pair = pair.flatten
+        build_secret_tuple(secrets, required_secrets, flat_pair.first)
+      end
     end
 
     def check_secrets(secrets)
@@ -124,13 +150,11 @@ module NuclearSecrets
       missing_pairs = build_pairs(missing_keys, secrets)
       extra_pairs = build_pairs(extra_keys, secrets)
       raise SecretsMissingError.new(missing_pairs) unless missing_keys.empty?
-      raise ExtraSecretsError.new(extra_pairs) unless extra_keys.empty?    
-      
+      raise ExtraSecretsError.new(extra_pairs) unless extra_keys.empty?
+
       assertions = build_assertions(secrets, existing_keys)
       error_pairs = check_assertions(secrets, assertions)
       raise MismatchedSecretType.new(error_pairs) if !error_pairs.empty?
-
-      # TODO print proc in error message
     end
   end
 end
