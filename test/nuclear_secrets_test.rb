@@ -5,8 +5,8 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
     assert_raises(NuclearSecrets::SecretsMissingError) do
       NuclearSecrets.configure do |c|
         c.required_secrets = {
-          one_fish: "String",
-          two_fish: "Fixnum",
+          one_fish: String,
+          two_fish: Fixnum,
         }
       end
 
@@ -18,7 +18,7 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
     assert_raises(NuclearSecrets::ExtraSecretsError) do
       NuclearSecrets.configure do |c|
         c.required_secrets = {
-          one_fish: "String",
+          one_fish: String,
         }
       end
       NuclearSecrets.check_secrets(
@@ -48,8 +48,8 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
     assert_nothing_raised do
       NuclearSecrets.configure do |c|
         c.required_secrets = {
-          one_fish: "String",
-          two_fish: "Fixnum",
+          one_fish: String,
+          two_fish: Fixnum,
         }
       end
       NuclearSecrets.check_secrets(
@@ -73,6 +73,57 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
         {
           one_fish: "Red Fish",
           two_fish: 2,
+        },
+      )
+    end
+  end
+
+  test "handles proc as value" do
+    assert_nothing_raised do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          one_fish: Proc.new { true },
+          two_fish: Fixnum,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          one_fish: "Red Fish",
+          two_fish: 2,
+        },
+      )
+    end
+  end
+
+  test "raises invalid required value with invalid value" do
+    assert_raises(NuclearSecrets::InvalidRequiredSecretValue) do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          one_fish: Proc.new { true },
+          two_fish: nil,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          one_fish: "Red Fish",
+          two_fish: 2,
+        },
+      )
+    end
+  end
+
+  test "raises mismatched value error" do
+    assert_raises(NuclearSecrets::MismatchedSecretType) do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          one_fish: Proc.new { true },
+          two_fish: Fixnum,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          one_fish: "Red Fish",
+          two_fish: "2",
         },
       )
     end
