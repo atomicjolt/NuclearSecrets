@@ -48,7 +48,7 @@ module NuclearSecrets
     end
 
     def message
-      "Missing secrets: \n#{get_error_list}"
+      "You are not using a secret that is required in the secrets list: \n#{get_error_list}"
     end
   end
 
@@ -58,7 +58,7 @@ module NuclearSecrets
     end
 
     def message
-      "Secrets not included in required_secrets list: \n#{get_error_list}"
+      "You have used a secret that is not in included in the secrets list: \n#{get_error_list}"
     end
   end
 
@@ -68,7 +68,7 @@ module NuclearSecrets
     end
 
     def message
-      "Invalid required secret: \n#{get_error_list}"
+      "You used an invalid secret: \n#{get_error_list}"
     end
   end
 
@@ -78,7 +78,7 @@ module NuclearSecrets
     end
 
     def message
-      "Invalid secrets given: \n#{get_error_list}"
+      "You included a secret of the wrong type: \n#{get_error_list}"
     end
   end
 end
