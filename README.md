@@ -35,7 +35,7 @@ In addition to being able to supply NuclearSecrets with the type of a secret,
 you can also pass a Proc or a Lambda. If the proc or lamba returns true when
 passed the value of the secret, then the secret will be allowed.
 
-```
+```ruby
 NuclearSecrets.configure do |config|
   config.required_secrets = {
     my_string_secret: String,
@@ -44,6 +44,22 @@ NuclearSecrets.configure do |config|
   }
 end
 ```
+
+## Settings
+You can add a settings object in the configure as well:
+
+```ruby
+NuclearSecrets.configure do |config|
+  config.required_secrets = {
+    ...
+  }
+  config.settings = {
+    raise_on_extra_secrets: false,
+  }
+end
+```
+
+  * `raise_on_extra_secrets`: raises an error when extra secrets are present(defaults to `false`)
 
 ## Contributing
 Contribution directions go here.

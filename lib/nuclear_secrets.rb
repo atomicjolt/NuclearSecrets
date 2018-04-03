@@ -1,12 +1,25 @@
 require "nuclear_secrets/engine"
 require "nuclear_secrets/errors"
+require "logger"
 
 module NuclearSecrets
   class << self
     attr_accessor(:required_secrets)
+    attr_accessor(:settings)
 
     def configure
       yield self if block_given?
+    end
+
+    def init_settings
+      @settings = {} unless @settings.is_a? Hash
+      @settings = default_settings.merge(@settings)
+    end
+
+    def default_settings
+      {
+        raise_on_extra_secrets: false,
+      }
     end
 
     def make_type_check(type)
@@ -58,6 +71,8 @@ module NuclearSecrets
     end
 
     def check_secrets(secrets)
+      logger = Logger.new(STDOUT)
+      init_settings
       raise NuclearSecrets::RequiredSecretsListMissing if required_secrets.nil?
       req_keys = required_secrets.keys
       existing_keys = secrets.keys
@@ -73,6 +88,9 @@ module NuclearSecrets
       assertions = build_assertions(secrets, existing_keys)
       error_pairs = check_assertions(secrets, assertions)
       raise MismatchedSecretType.new(error_pairs) if !error_pairs.empty?
+    rescue ExtraSecretsError => e
+      logger.warn e.message
+      raise e if @settings[:raise_on_extra_secrets] == true
     end
   end
 end
