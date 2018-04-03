@@ -20,10 +20,32 @@ class NuclearSecrets::Test < ActiveSupport::TestCase
         c.required_secrets = {
           one_fish: String,
         }
+        c.settings = {
+          raise_on_extra_secrets: true,
+        }
       end
       NuclearSecrets.check_secrets(
         {
           one_fish: "Red Fish",
+          two_fish: 2,
+        },
+      )
+    end
+  end
+
+  test "log warning when extra secrets are provided" do
+    assert_nothing_raised do
+      NuclearSecrets.configure do |c|
+        c.required_secrets = {
+          three_fish: String,
+        }
+        c.settings = {
+          raise_on_extra_secrets: false,
+        }
+      end
+      NuclearSecrets.check_secrets(
+        {
+          three_fish: "Red Fish",
           two_fish: 2,
         },
       )
