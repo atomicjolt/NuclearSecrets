@@ -51,15 +51,17 @@ module NuclearSecrets
             [
               build_secret_tuple(secrets, required_secrets, key),
             ],
-          )
+          ) if @settings[:raise_on_extra_secrets] == true
         end
-      end
+      end.compact
     end
 
     def check_assertions(secrets, assertions)
       secrets.to_a.zip(assertions).select do |pair|
-        result = pair.last.call(pair.first[1])
-        if !result
+        result = if pair.last.present?
+                   pair.last.call(pair.first[1])
+                 end
+        if !result && @settings[:raise_on_extra_secrets] == true
           pair.first[0]
         else
           false
@@ -70,8 +72,15 @@ module NuclearSecrets
       end
     end
 
-    def check_secrets(secrets)
+    def handle_extra_keys(extra_keys, extra_pairs)
+      raise ExtraSecretsError.new(extra_pairs) unless extra_keys.empty?
+    rescue ExtraSecretsError => e
       logger = Logger.new(STDOUT)
+      logger.warn e.message
+      raise e if @settings[:raise_on_extra_secrets] == true
+    end
+
+    def check_secrets(secrets)
       init_settings
       raise NuclearSecrets::RequiredSecretsListMissing if required_secrets.nil?
       req_keys = required_secrets.keys
@@ -83,14 +92,11 @@ module NuclearSecrets
       missing_pairs = build_pairs(missing_keys, secrets)
       extra_pairs = build_pairs(extra_keys, secrets)
       raise SecretsMissingError.new(missing_pairs) unless missing_keys.empty?
-      raise ExtraSecretsError.new(extra_pairs) unless extra_keys.empty?
+      handle_extra_keys(extra_keys, extra_pairs)
 
       assertions = build_assertions(secrets, existing_keys)
       error_pairs = check_assertions(secrets, assertions)
       raise MismatchedSecretType.new(error_pairs) if !error_pairs.empty?
-    rescue ExtraSecretsError => e
-      logger.warn e.message
-      raise e if @settings[:raise_on_extra_secrets] == true
     end
   end
 end
