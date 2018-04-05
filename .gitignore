@@ -1,11 +1,11 @@
 .bundle/
 log/*.log
 pkg/
-test/dummy/db/*.sqlite3
-test/dummy/db/*.sqlite3-journal
+test/dummy/db/*
 test/dummy/log/*.log
 test/dummy/tmp/
 .byebug_history
 notes.md
 /Gemfile.lock
-test/dummy/.byebug_history
+.byebug_history
+*.gem
